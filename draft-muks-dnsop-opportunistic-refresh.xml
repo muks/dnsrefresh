@@ -93,9 +93,9 @@
       <t>This document describes a mechanism using which a DNS client
       can receive information about the freshness of a zone's cached
       records from an authoritative server, and can opportunistically
-      refresh TTLs of the zone's cached records without making
-      additional queries over the network to refresh expired
-      records.</t>
+      refresh TTLs of all of the zone's cached records without making
+      additional queries per each record over the network to refresh
+      expired records.</t>
 
     </abstract>
 
