@@ -106,10 +106,80 @@
     <section title="Introduction">
     </section>
 
+    <section title="Client and server behavior" anchor="sec-behavior">
+    </section>
+
+    <section title="The ZONE EDNS(0) option" anchor="sec-format">
+
+      <t>ZONE is an EDNS(0) <xref target="RFC6891" /> option that is
+      used to transmit information about a zone. Client and server
+      behavior are described in <xref target="sec-behavior" />. In this
+      section, the option's syntax is provided.</t>
+
+      <section title="Wire format">
+
+        <t>The following describes the wire format of the OPTION-DATA
+        field <xref target="RFC6891" /> of the ZONE EDNS option. All
+        ZONE option fields must be represented in network byte
+        order.</t>
+
+        <texttable>
+
+          <ttcol>Option field</ttcol>
+          <ttcol>Type</ttcol>
+          <ttcol>Field size</ttcol>
+
+          <c>SERIAL</c>
+          <c>32-bit unsigned integer</c>
+          <c>4 octets</c>
+
+          <c>ZONENAME</c>
+          <c>DNS name <xref target="RFC1035" /></c>
+          <c>Variable length</c>
+
+        </texttable>
+
+      </section>
+
+      <section title="Option fields">
+        <section title="SERIAL">
+          <t>The SERIAL field is represented as a 32-bit unsigned
+          integer in network byte order. TBD.</t>
+        </section>
+        <section title="ZONENAME">
+          <t>The ZONENAME field contains the name of the zone which
+          contains the authoritative answer for the question. TBD.</t>
+        </section>
+      </section>
+      <section title="Presentation format">
+        <t>As with other EDNS(0) options, the ZONE EDNS option does not
+        have a presentation format.</t>
+      </section>
+    </section>
+
     <section title="Security considerations" anchor="sec-security">
     </section>
 
     <section title="IANA considerations">
+      <t>This document defines a new EDNS(0) option, titled ZONE (see
+      <xref target="sec-format" />), assigned a value of &lt;TBD&gt;
+      from the DNS EDNS0 Option Codes (OPT) space [to be removed upon
+      publication:
+      https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11].</t>
+
+      <texttable>
+
+        <ttcol>Value</ttcol>
+        <ttcol>Name</ttcol>
+        <ttcol>Status</ttcol>
+        <ttcol>Reference</ttcol>
+
+        <c>TBD</c>
+        <c>ZONE</c>
+        <c>TBD</c>
+        <c>[draft-muks-dnsop-opportunistic-refresh]</c>
+
+      </texttable>
     </section>
 
     <section title="Acknowledgements">
@@ -121,6 +191,7 @@
 
     <references title="Normative references">
       <?rfc include="reference.RFC.1035.xml"?>
+      <?rfc include="reference.RFC.6891.xml"?>
     </references>
 
     <section title="Change history (to be removed before publication)">
