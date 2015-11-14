@@ -99,7 +99,6 @@
       of authoritative servers in constructing replies for refresh
       queries, and the risk of losing such replies across the
       network.</t>
-
     </abstract>
 
   </front>
@@ -204,8 +203,25 @@
 
     <references title="Normative references">
       <?rfc include="reference.RFC.1035.xml"?>
+      <?rfc include="reference.RFC.2308.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
     </references>
+
+    <section title="Open issues (to be removed before publication)">
+      <t>
+	<list style="symbols">
+
+	  <t>An alternate scheme is proposed, that includes the SOA RR
+	  in the additional section of every reply and doesn't use the
+	  EDNS option. If a nameserver doesn't maintain the SOA serial,
+	  it doesn't include the SOA RR. A client doesn't process SOA
+	  RRs for this scheme from negative answers <xref
+	  target="RFC2308" />. Some advantages of using the EDNS option
+	  are not available with this scheme.</t>
+
+	</list>
+      </t>
+    </section>
 
     <section title="Change history (to be removed before publication)">
       <t>
