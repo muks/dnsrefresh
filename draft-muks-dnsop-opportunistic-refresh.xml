@@ -126,7 +126,11 @@
       cached resource and extend its lifetime without requiring a
       retransfer of the resource.</t>
 
-      <t>Caching resolvers can also take advantage of such a scheme.</t>
+      <t>This memo introduces such a scheme to DNS QUERY which can
+      benefit DNS when caching resolvers are involved. There are several
+      advantages in having this scheme in DNS, and these are explored in
+      <xref target="sec-advantages" />.</t>
+
       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
       NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
       in this document are to be interpreted as described in <xref
@@ -134,6 +138,9 @@
     </section>
 
     <section title="Client and server behavior" anchor="sec-behavior">
+      <section title="Advantages" anchor="sec-advantages">
+	<t>TBD.</t>
+      </section>
     </section>
 
     <section title="The ZONE EDNS(0) option" anchor="sec-format">
