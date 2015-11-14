@@ -205,9 +205,10 @@
       Krecicki. Stephen joined as an author after suggesting changes to
       improve presentation of the ideas and alternate schemes.</t>
 
-      <t>Ray Bellis pointed a dnsop mailing list thread where a similar
-      idea is considered by Bob Harold in reply to discussion about
-      <xref target="I-D.yao-dnsop-root-cache" /> on 28 October 2015.</t>
+      <t>Ray Bellis pointed to a dnsop mailing list thread where a
+      similar idea is considered by Bob Harold in reply to discussion
+      about <xref target="I-D.yao-dnsop-root-cache" /> on 28 October
+      2015.</t>
     </section>
 
   </middle>
