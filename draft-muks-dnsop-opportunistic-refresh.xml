@@ -195,6 +195,19 @@
     </section>
 
     <section title="Acknowledgements">
+      <t>The idea was first discussed by Shane and Mukund during IETF-94
+      where various advantages of using such a scheme were
+      discovered. During the same IETF meeting, the scheme was verbally
+      described to and discussed with Ray Bellis, Geoff Huston and
+      George Michaelson from which the scheme was refined. After the
+      IETF meeting, initial drafts of the idea were reviewed by Cathy
+      Almond, Mark Andrews, Ray Bellis, Evan Hunt and Witold
+      Krecicki. Stephen joined as an author after suggesting changes to
+      improve presentation of the ideas and alternate schemes.</t>
+
+      <t>Ray Bellis pointed a dnsop mailing list thread where a similar
+      idea is considered by Bob Harold in reply to discussion about
+      <xref target="I-D.yao-dnsop-root-cache" /> on 28 October 2015.</t>
     </section>
 
   </middle>
@@ -205,6 +218,10 @@
       <?rfc include="reference.RFC.1035.xml"?>
       <?rfc include="reference.RFC.2308.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
+    </references>
+
+    <references title="Informative references">
+      <?rfc include="reference.I-D.yao-dnsop-root-cache.xml"?>
     </references>
 
     <section title="Open issues (to be removed before publication)">
