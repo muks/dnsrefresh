@@ -217,11 +217,11 @@
 
     <references title="Normative references">
       <?rfc include="reference.RFC.1035.xml"?>
-      <?rfc include="reference.RFC.2308.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
     </references>
 
     <references title="Informative references">
+      <?rfc include="reference.RFC.2308.xml"?>
       <?rfc include="reference.I-D.yao-dnsop-root-cache.xml"?>
     </references>
 
