@@ -90,7 +90,7 @@
     <!-- <keyword>dns</keyword> -->
 
     <abstract>
-      <t>This document describes a mechanism using which a DNS client
+      <t>This document describes a mechanism using which a DNS resolver
       can receive information about the freshness of a zone's cached
       records from an authoritative server, and can opportunistically
       refresh TTLs of all of the zone's cached records without making
