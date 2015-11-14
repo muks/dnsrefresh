@@ -118,6 +118,15 @@
       field, nameservers avoid redundant and unnecessary zone transfers
       for local data that is already fresh, thereby reducing network
       traffic and nameserver resource usage.</t>
+
+      <t>Similarly, HTTP is a request/response protocol that allows
+      caching data with a TTL duration. HTTP provides the concept of
+      "cache validators" (see Section 13.3 of <xref target="RFC2616" />)
+      using which a HTTP client can validate the freshness of an expired
+      cached resource and extend its lifetime without requiring a
+      retransfer of the resource.</t>
+
+      <t>Caching resolvers can also take advantage of such a scheme.</t>
     </section>
 
     <section title="Client and server behavior" anchor="sec-behavior">
@@ -230,6 +239,7 @@
     <references title="Normative references">
       <?rfc include="reference.RFC.1035.xml"?>
       <?rfc include="reference.RFC.1982.xml"?>
+      <?rfc include="reference.RFC.2616.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
     </references>
 
