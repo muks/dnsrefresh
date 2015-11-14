@@ -209,17 +209,27 @@
 
     <section title="Open issues (to be removed before publication)">
       <t>
-	<list style="symbols">
+        <list style="symbols">
 
-	  <t>An alternate scheme is proposed, that includes the SOA RR
-	  in the additional section of every reply and doesn't use the
-	  EDNS option. If a nameserver doesn't maintain the SOA serial,
-	  it doesn't include the SOA RR. A client doesn't process SOA
-	  RRs for this scheme from negative answers <xref
-	  target="RFC2308" />. Some advantages of using the EDNS option
-	  are not available with this scheme.</t>
+          <t>Stephen: An alternate scheme is proposed, that includes the
+          SOA RR in the additional section of every reply and doesn't
+          use the EDNS option. If a nameserver doesn't maintain the SOA
+          serial, it doesn't include the SOA RR. A client doesn't
+          process SOA RRs for this scheme from negative answers <xref
+          target="RFC2308" />. Some advantages of using the EDNS option
+          are not available with this scheme.</t>
 
-	</list>
+          <t>Ray: one thing you may have to consider is NS record
+          handling - there's an issue where a resolver always talks to a
+          child without ever referring back to the parent NS perpetually
+          prolonging the TTL of NS records learned from the child can
+          permit phantom zones (where the zone may have been turned off,
+          or had parent NS changes, but the resolver doesn't notice)</t>
+
+          <t>The behavior of when DNSSEC re-validation may be avoided
+          should be described precisely.</t>
+
+        </list>
       </t>
     </section>
 
