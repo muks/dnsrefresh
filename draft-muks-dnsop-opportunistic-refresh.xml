@@ -138,6 +138,16 @@
     </section>
 
     <section title="Client and server behavior" anchor="sec-behavior">
+
+      <t>The SOA SERIAL field's value is largely only used for zone
+      transfers. Some custom authoritiative servers that don't implement
+      zone transfers do not care to maintain a useful value in the
+      field.</t>
+
+      <t>Use of this scheme can be switched off completely either by the
+      authoritiative nameserver or by the caching resolver, on a
+      per-zone basis.</t>
+
       <section title="Advantages" anchor="sec-advantages">
 	<t>TBD.</t>
       </section>
