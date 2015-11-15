@@ -189,6 +189,9 @@
 	case, the OPTION-DATA field is empty and OPTION-LENGTH field for
 	the EDNS option is set to 0.</t>
 
+	<t>In all other cases, both fields MUST be present in the
+	option.</t>
+
       </section>
 
       <section title="Option fields">
