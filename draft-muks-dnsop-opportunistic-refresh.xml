@@ -123,7 +123,7 @@
       caching data with a TTL duration. HTTP provides the concept of
       "cache validators" (see Section 13.3 of <xref target="RFC2616" />)
       using which a HTTP client can validate the freshness of an expired
-      cached resource and extend its lifetime without requiring a
+      resource in cache and extend its lifetime without requiring a
       retransfer of the resource.</t>
 
       <t>This memo introduces such a scheme to DNS QUERY which can
