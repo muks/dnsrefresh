@@ -151,10 +151,10 @@
       <section title="Advantages" anchor="sec-advantages">
 
         <t>It may seem non-intuitive, but on a caching resolver, this
-        scheme benefits typical smaller zones more than typical larger
-        zones. Typically, smaller zones are updated less frequently, and
-        so, a cached record from a small zone is more likely to be
-        fresh.</t>
+        scheme would benefit typical smaller zones more than typical
+        larger zones. Typically, smaller zones are updated less
+        frequently, and so, a cached record from a small zone is more
+        likely to be fresh.</t>
 
         <t>TBD: Add use-cases of common multi-lookup sequences described
         to Evan (A and DNSKEY; SRV and A; small office setups that
