@@ -280,6 +280,11 @@
         <t>Note that other records from the same zone can be similarly
         refreshed without network fetches.</t>
 
+        <t>TBD: Add use-cases of common multi-lookups described to Evan
+        (A + DNSKEY; SRV + A; small office setups that typically have
+        www, mail, jabber, sip, git, wiki, etc. that get lookups
+        continuously)</t>
+
       </section>
     </section>
 
