@@ -149,7 +149,7 @@
       per-zone basis.</t>
 
       <section title="Advantages" anchor="sec-advantages">
-	<t>TBD.</t>
+        <t>TBD.</t>
       </section>
     </section>
 
@@ -183,14 +183,14 @@
 
         </texttable>
 
-	<t>The SERIAL and ZONENAME fields may together be absent from
-	query messages when these values are unknown to the client (from
-	previous queries) for the question it is querying for. In this
-	case, the OPTION-DATA field is empty and OPTION-LENGTH field for
-	the EDNS option is set to 0.</t>
+        <t>The SERIAL and ZONENAME fields may together be absent from
+        query messages when these values are unknown to the client (from
+        previous queries) for the question it is querying for. In this
+        case, the OPTION-DATA field is empty and OPTION-LENGTH field for
+        the EDNS option is set to 0.</t>
 
-	<t>In all other cases, both fields MUST be present in the
-	option.</t>
+        <t>In all other cases, both fields MUST be present in the
+        option.</t>
 
       </section>
 
@@ -302,10 +302,10 @@
           <t>The behavior of when DNSSEC re-validation may be avoided
           should be described precisely.</t>
 
-	  <t><xref target="I-D.ietf-dnsop-edns-client-subnet" /> can
-	  supply different answers depending on the client subnet. The
-	  interaction with this scheme should be explored and any
-	  necessary changes should be made to accomodate it.</t>
+          <t><xref target="I-D.ietf-dnsop-edns-client-subnet" /> can
+          supply different answers depending on the client subnet. The
+          interaction with this scheme should be explored and any
+          necessary changes should be made to accomodate it.</t>
 
         </list>
       </t>
