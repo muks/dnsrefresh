@@ -173,6 +173,12 @@
 
         </texttable>
 
+	<t>The SERIAL and ZONENAME fields may be absent from query
+	messages when these values are unknown to the client (from
+	previous queries) for the question it is querying for. In this
+	case, the OPTION-DATA field is empty and OPTION-LENGTH field for
+	the EDNS option is set to 0.</t>
+
       </section>
 
       <section title="Option fields">
