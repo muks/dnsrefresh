@@ -336,7 +336,10 @@
         </section>
         <section title="ZONENAME">
           <t>The ZONENAME field contains the name of the zone which
-          contains the authoritative answer for the question. TBD.</t>
+          contains the authoritative answer for the question. This is
+          represented as a DNS name in wire format <xref
+          target="RFC1035" />. Name compression MUST NOT be used <xref
+          target="RFC3597" />. TBD.</t>
         </section>
       </section>
       <section title="Presentation format">
@@ -405,6 +408,7 @@
       <?rfc include="reference.RFC.1035.xml"?>
       <?rfc include="reference.RFC.1982.xml"?>
       <?rfc include="reference.RFC.2119.xml"?>
+      <?rfc include="reference.RFC.3597.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
       <?rfc include="reference.I-D.wkumari-dnsop-hammer.xml"?>
     </references>
