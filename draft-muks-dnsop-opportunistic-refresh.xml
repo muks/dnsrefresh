@@ -277,6 +277,9 @@
 
         </texttable>
 
+        <t>Note that other records from the same zone can be similarly
+        refreshed without network fetches.</t>
+
       </section>
     </section>
 
