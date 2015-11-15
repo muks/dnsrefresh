@@ -151,6 +151,133 @@
       <section title="Advantages" anchor="sec-advantages">
         <t>TBD.</t>
       </section>
+
+      <section title="Examples" anchor="sec-examples">
+        <t>An example of the scheme follows, to illuminate the idea:</t>
+
+        <texttable>
+
+          <ttcol align="right">TIME</ttcol>
+          <ttcol align="left">Resolver behavior</ttcol>
+
+          <c>-15.0</c>
+          <c>receives query for mail.example.org./A</c>
+
+          <c>-10.0</c>
+          <c>queries nameserver for mail.example.org./A with empty
+          ZONE option</c>
+
+          <c>0.0</c>
+          <c>caches auth answer mail.example.org./A with TTL=3600,
+          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+
+          <c>0.1</c>
+          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
+          TIME=0</c>
+
+          <c>0.2</c>
+          <c>replies from cache for mail.example.org./A</c>
+
+          <c>2595.0</c>
+          <c>receives query for git.example.org./A</c>
+
+          <c>2600.0</c>
+          <c>queries nameserver for git.example.org./A with empty
+          ZONE option</c>
+
+          <c>2700.0</c>
+          <c>caches auth answer git.example.org./A with TTL=3600,
+          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+
+          <c>2700.1</c>
+          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
+          TIME=2700</c>
+
+          <c>2700.2</c>
+          <c>replies from cache for git.example.org./A</c>
+
+          <c>3601.0</c>
+          <c>receives query for mail.example.org./A</c>
+
+          <c>3601.1</c>
+          <c>has note that SERIAL was unchanged at TIME=2700, so
+          its cached mail.example.org./A answer is valid till time
+          2700+3600</c>
+
+          <c>3601.2</c>
+          <c>bumps mail.example.org./A TTL to expire at TIME=6300</c>
+
+          <c>3601.3</c>
+          <c>replies from cache for mail.example.org./A</c>
+
+        </texttable>
+
+        <t>The same can similarly be adopted for lazy TTL update during
+        prefetch <xref target="I-D.wkumari-dnsop-hammer" />:</t>
+
+        <texttable>
+
+          <ttcol align="right">TIME</ttcol>
+          <ttcol align="left">Resolver behavior</ttcol>
+
+          <c>-15.0</c>
+          <c>receives query for mail.example.org./A</c>
+
+          <c>-10.0</c>
+          <c>queries nameserver for mail.example.org./A with empty
+          ZONE option</c>
+
+          <c>0.0</c>
+          <c>caches auth answer mail.example.org./A with TTL=3600,
+          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+
+          <c>0.1</c>
+          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
+          TIME=0</c>
+
+          <c>0.2</c>
+          <c>replies from cache for mail.example.org./A</c>
+
+          <c>2595.0</c>
+          <c>receives query for git.example.org./A</c>
+
+          <c>2600.0</c>
+          <c>queries nameserver for git.example.org./A with empty
+          ZONE option</c>
+
+          <c>2700.0</c>
+          <c>caches auth answer git.example.org./A with TTL=3600,
+          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+
+          <c>2700.1</c>
+          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
+          TIME=2700</c>
+
+          <c>2700.2</c>
+          <c>replies from cache for git.example.org./A</c>
+
+          <c>3595.0</c>
+          <c>receives query for mail.example.org./A</c>
+
+          <c>3595.0</c>
+          <c>replies from cache for mail.example.org./A</c>
+
+          <c>3595.0</c>
+          <c>determines that prefetch is required for
+          mail.example.org./A</c>
+
+          <c>3595.0</c>
+          <c>has note that SERIAL was unchanged at TIME=2700, so
+          its cached mail.example.org./A answer is valid till time
+          2700+3600</c>
+
+          <c>3595.0</c>
+          <c>resolver bumps mail.example.org./A TTL to expire at
+          TIME=6300</c>
+
+        </texttable>
+
+      </section>
     </section>
 
     <section title="The ZONE EDNS(0) option" anchor="sec-format">
@@ -271,6 +398,7 @@
       <?rfc include="reference.RFC.1982.xml"?>
       <?rfc include="reference.RFC.2119.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
+      <?rfc include="reference.I-D.wkumari-dnsop-hammer.xml"?>
     </references>
 
     <references title="Informative references">
