@@ -345,9 +345,9 @@
       client for use in cases where the zone cuts cannot be determined
       without additional queries to the nameserver, such as when a
       hierarchy of zones are served by the same nameserver. The DNS
-      resolver MUST check that this field contains either the determined
-      zone cut, or is a child of the zone cut but is equal to or a
-      super-domain of the name in the question.</t>
+      resolver MUST check that this field contains either the expected
+      zone cut, or is a child of the expected zone cut but is equal to
+      or a super-domain of the name in the question.</t>
     </section>
 
     <section title="IANA considerations">
