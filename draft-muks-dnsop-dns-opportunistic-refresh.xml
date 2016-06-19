@@ -30,7 +30,7 @@
 <!-- end of list of popular I-D processing instructions -->
 <?rfc comments="no" ?>
 <?rfc inline="yes" ?>
-<rfc category="exp" docName="draft-muks-dnsop-opportunistic-refresh-00" ipr="trust200902">
+<rfc category="exp" docName="draft-muks-dnsop-dns-opportunistic-refresh-00" ipr="trust200902">
 
   <front>
 
@@ -388,7 +388,7 @@
         <c>TBD</c>
         <c>ZONE</c>
         <c>TBD</c>
-        <c>[draft-muks-dnsop-opportunistic-refresh]</c>
+        <c>[draft-muks-dnsop-dns-opportunistic-refresh]</c>
 
       </texttable>
     </section>
@@ -472,7 +472,7 @@
         <list style="symbols">
 
           <t>
-          draft-muks-dnsop-opportunistic-refresh-00
+          draft-muks-dnsop-dns-opportunistic-refresh-00
           <vspace/>
           Initial draft.
           </t>

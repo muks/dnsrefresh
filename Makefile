@@ -1,7 +1,7 @@
-all: draft-muks-dnsop-opportunistic-refresh.txt draft-muks-dnsop-opportunistic-refresh.html
+all: draft-muks-dnsop-dns-opportunistic-refresh.txt draft-muks-dnsop-dns-opportunistic-refresh.html
 
-draft-muks-dnsop-opportunistic-refresh.txt: draft-muks-dnsop-opportunistic-refresh.xml
+draft-muks-dnsop-dns-opportunistic-refresh.txt: draft-muks-dnsop-dns-opportunistic-refresh.xml
 	xml2rfc $<
 
-draft-muks-dnsop-opportunistic-refresh.html: draft-muks-dnsop-opportunistic-refresh.xml
+draft-muks-dnsop-dns-opportunistic-refresh.html: draft-muks-dnsop-dns-opportunistic-refresh.xml
 	xml2rfc --html $<
