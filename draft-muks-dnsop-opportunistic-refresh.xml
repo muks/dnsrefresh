@@ -442,6 +442,12 @@
           target="RFC2308" />. Some advantages of using the EDNS option
           are not available with this scheme.</t>
 
+          <t>The provision of a timestamp of when the zone was last
+          updated should be explored. Because there is no existing way
+          to record and transfer the last updated time of a zone among
+          primary and secondary nameservers, this may be a controversial
+          addition.</t>
+
           <t>Ray: one thing you may have to consider is NS record
           handling - there's an issue where a resolver always talks to a
           child without ever referring back to the parent NS perpetually
