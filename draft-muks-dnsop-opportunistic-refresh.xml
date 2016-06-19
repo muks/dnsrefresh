@@ -458,7 +458,7 @@
           <t>The behavior of when DNSSEC re-validation may be avoided
           should be described precisely.</t>
 
-          <t><xref target="RFC7871" /> (EDNS client-subnet) can supply
+          <t>EDNS client-subnet <xref target="RFC7871" /> can supply
           different answers depending on the client subnet. The
           interaction with this scheme should be explored and any
           necessary changes should be made to accomodate it.</t>
