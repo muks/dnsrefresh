@@ -34,7 +34,7 @@
 
   <front>
 
-    <title>Opportunistic refresh for DNS resolvers</title>
+    <title>DNS opportunistic refresh for resolvers</title>
 
     <author fullname="Shane Kerr" initials="S." surname="Kerr">
       <organization>Beijing Internet Institute</organization>
