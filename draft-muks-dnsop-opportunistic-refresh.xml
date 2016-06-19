@@ -445,7 +445,7 @@
           child without ever referring back to the parent NS perpetually
           prolonging the TTL of NS records learned from the child can
           permit phantom zones (where the zone may have been turned off,
-          or had parent NS changes, but the resolver doesn't notice)</t>
+          or had parent NS changes, but the resolver doesn't notice).</t>
 
           <t>The behavior of when DNSSEC re-validation may be avoided
           should be described precisely.</t>
