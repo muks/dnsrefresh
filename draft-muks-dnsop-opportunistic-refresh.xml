@@ -94,10 +94,10 @@
       can receive information about the freshness of a zone's cached
       records from an authoritative server, and can opportunistically
       refresh TTLs of all of the zone's cached records without making
-      additional queries per each record over the network to refresh
+      additional queries per each record set over the network to refresh
       expired records. Using this mechanism can also reduce the workload
       of authoritative servers in constructing replies for refresh
-      queries, and the risk of losing such replies across the
+      queries and the risk of losing such replies across the
       network.</t>
     </abstract>
 
