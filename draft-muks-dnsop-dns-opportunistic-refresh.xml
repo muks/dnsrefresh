@@ -144,28 +144,40 @@
       <t>The SOA SERIAL field's value is largely only used for zone
       transfers. Some custom authoritiative servers that don't implement
       zone transfers do not care to maintain a useful value in the
-      field. This memo introduces a serial with a new serial value for
-      zones that can be used to check for freshness of the zone's
-      data. The new serial value can be identical to the value in the
+      field. This memo introduces a ZONESERIAL field with a new per-zone
+      serial value that can be used to check for freshness of the zone's
+      data. The ZONESERIAL value can be identical to the value in the
       SOA SERIAL field, or can hold a different value as long as its
-      semantics are similar to the SOA SERIAL field.</t>
+      semantics are similar to the SOA SERIAL field as defined in <xref
+      target="RFC1982" />.</t>
 
-      <t>To signal support for DNS opportunistic refresh, clients add an
-      EDNS option named ZONE to their queries as described in <xref
-      target="sec-format" />. If the authoritative server supports the
-      feature, it returns a ZONE option in its reply from the contents
-      of which a client can determine if all the records it has cached
-      for that zone are still fresh.</t>
+      <t>To signal support for DNS opportunistic refresh, clients add a
+      ZONE EDNS option to their queries. The ZONE EDNS option contains 2
+      fields: ZONESERIAL and ZONENAME. These fields are described in
+      <xref target="sec-format" />. If the authoritative server supports
+      the feature, it returns a ZONE EDNS option in its reply from the
+      contents of which a client can determine if all the records it
+      currently has cached for that zone are still fresh.</t>
 
       <t>Use of this scheme is voluntary and can be switched off
-      completely either by the authoritiative nameserver or by the
-      caching resolver, on a per-zone basis. Queries between a client
-      and authoritative server where one side does not implement or
-      enable this scheme are not affected.</t>
+      completely on a per-zone basis either by the authoritiative
+      nameserver or by the caching resolver. Queries between a client
+      and authoritative server where one side does not implement and
+      enable this EDNS option are not affected.</t>
+
+      <t>It is OPTIONAL for a client to add a ZONE EDNS option to DNS
+      query messages. If it adds such an option, it might be of 0 length
+      (having no fields) or have 2 fields. If a client has no prior
+      cached ZONESERIAL field value from a previous query for that zone,
+      it sends a 0 length EDNS option to signal support for the DNS
+      opportunistic refresh feature. If it has a previously cached
+      ZONESERIAL and ZONENAME matching the zone it is querying, it sends
+      a ZONE EDNS option with the ZONESERIAL and ZONENAME set to their
+      most recently cached values.</t>
 
       <t>TBD: Transitive use of this scheme through forwarders and
       intermediate resolvers (RD=1) where the nameserver may return a
-      non-authoritative answer (AA=0) is currently undefined and may
+      non-authoritative answer (AA=0) is currently unsupported and may
       remain so.</t>
 
       <section title="Advantages" anchor="sec-advantages">
