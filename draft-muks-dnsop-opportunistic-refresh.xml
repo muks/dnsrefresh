@@ -344,9 +344,9 @@
           integer in network byte order. TBD.</t>
         </section>
         <section title="ZONENAME">
-          <t>The ZONENAME field contains the name of the zone which
-          contains the authoritative answer for the question. This is
-          represented as a DNS name in wire format <xref
+          <t>The ZONENAME field contains the origin name of the zone
+          which contains the authoritative answer for the question. This
+          is represented as a DNS name in wire format <xref
           target="RFC1035" />. Name compression MUST NOT be used <xref
           target="RFC3597" />. TBD.</t>
         </section>
