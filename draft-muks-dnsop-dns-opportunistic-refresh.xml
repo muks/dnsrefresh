@@ -144,11 +144,29 @@
       <t>The SOA SERIAL field's value is largely only used for zone
       transfers. Some custom authoritiative servers that don't implement
       zone transfers do not care to maintain a useful value in the
-      field.</t>
+      field. This memo introduces a serial with a new serial value for
+      zones that can be used to check for freshness of the zone's
+      data. The new serial value can be identical to the value in the
+      SOA SERIAL field, or can hold a different value as long as its
+      semantics are similar to the SOA SERIAL field.</t>
 
-      <t>Use of this scheme can be switched off completely either by the
-      authoritiative nameserver or by the caching resolver, on a
-      per-zone basis.</t>
+      <t>To signal support for DNS opportunistic refresh, clients add an
+      EDNS option named ZONE to their queries as described in <xref
+      target="sec-format" />. If the authoritative server supports the
+      feature, it returns a ZONE option in its reply using which a
+      client can determine if all the records it has cached for that
+      zone are still fresh.</t>
+
+      <t>Use of this scheme is voluntary and can be switched off
+      completely either by the authoritiative nameserver or by the
+      caching resolver, on a per-zone basis. Queries between a client
+      and authoritative server where one side does not implement or
+      enable this scheme are not affected.</t>
+
+      <t>TBD: Transitive use of this scheme through forwarders and
+      intermediate resolvers (RD=1) where the nameserver may return a
+      non-authoritative answer (AA=0) is currently undefined and may
+      remain so.</t>
 
       <section title="Advantages" anchor="sec-advantages">
 
