@@ -177,7 +177,7 @@
         fresh.</t>
 
         <t>TBD: Add use-cases of common multi-lookup sequences described
-        to Evan (A and DNSKEY; SRV and A; small office setups that
+        to Evan (AAAA and DNSKEY; SRV and AAAA; small office setups that
         typically have www, mail, jabber, sip, git, wiki, etc. that get
         lookups continuously)</t>
 
