@@ -107,14 +107,15 @@
 
     <section title="Introduction">
       <t>DNS secondary nameservers use the value in a zone's SOA RR's
-      SERIAL field to determine freshness of the copy of the zone that
-      they are maintaining locally, and establish if a zone transfer to
-      update the zone is necessary. Typically they perform this through
-      SOA refresh timeout or the NOTIFY mechanism, when they compare the
-      SOA SERIAL value from the local copy of a zone against the SOA
-      SERIAL value from a remote primary nameserver, and perform a zone
-      transfer if the serial number comparison <xref target="RFC1982" />
-      establishes that a zone transfer is necessary. By using the SERIAL
+      SERIAL field <xref target="RFC1035" /> to determine freshness of
+      the copy of a zone that they are maintaining locally, and to
+      establish if a zone transfer to update the zone is
+      necessary. Typically they perform this through SOA refresh timeout
+      or the NOTIFY mechanism, when they compare the SOA SERIAL value
+      from the local copy of a zone against the SOA SERIAL value from a
+      remote primary nameserver, and perform a zone transfer if the
+      serial number comparison <xref target="RFC1982" /> establishes
+      that a zone transfer is necessary. By using the SOA RR's SERIAL
       field, nameservers avoid redundant and unnecessary zone transfers
       for local data that is already fresh, thereby reducing network
       traffic and nameserver resource usage.</t>
@@ -126,10 +127,11 @@
       resource in cache and extend its lifetime without requiring a
       retransfer of the resource.</t>
 
-      <t>This memo introduces such a scheme to DNS QUERY which can
-      benefit DNS when caching resolvers are involved. There are several
-      advantages in having this scheme in DNS, and these are explored in
-      <xref target="sec-advantages" />.</t>
+      <t>This memo introduces such a scheme to non-transfer DNS QUERY
+      which can benefit the DNS when caching resolvers are
+      involved. There are several advantages in having this scheme in
+      the DNS, and these are explored in <xref target="sec-advantages"
+      />.</t>
 
       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
       NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
@@ -151,10 +153,10 @@
       <section title="Advantages" anchor="sec-advantages">
 
         <t>It may seem non-intuitive, but on a caching resolver, this
-        scheme would benefit typical smaller zones more than typical
-        larger zones. Typically, smaller zones are updated less
-        frequently, and so, a cached record from a small zone is more
-        likely to be fresh.</t>
+        scheme could benefit smaller zones more than larger
+        zones. Typically, smaller zones are updated less frequently, and
+        so, cached records from a small zone are more likely to be
+        fresh.</t>
 
         <t>TBD: Add use-cases of common multi-lookup sequences described
         to Evan (A and DNSKEY; SRV and A; small office setups that
