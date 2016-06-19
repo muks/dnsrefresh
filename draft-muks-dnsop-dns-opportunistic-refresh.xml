@@ -153,9 +153,9 @@
       <t>To signal support for DNS opportunistic refresh, clients add an
       EDNS option named ZONE to their queries as described in <xref
       target="sec-format" />. If the authoritative server supports the
-      feature, it returns a ZONE option in its reply using which a
-      client can determine if all the records it has cached for that
-      zone are still fresh.</t>
+      feature, it returns a ZONE option in its reply from the contents
+      of which a client can determine if all the records it has cached
+      for that zone are still fresh.</t>
 
       <t>Use of this scheme is voluntary and can be switched off
       completely either by the authoritiative nameserver or by the
