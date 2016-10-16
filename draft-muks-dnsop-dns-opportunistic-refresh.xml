@@ -144,12 +144,13 @@
       <t>The SOA SERIAL field's value is largely only used for zone
       transfers. Some custom authoritiative servers that don't implement
       zone transfers do not care to maintain a useful value in the
-      field. This memo introduces a ZONESERIAL field with a new per-zone
-      serial value that can be used to check for freshness of the zone's
-      data. The ZONESERIAL value can be identical to the value in the
-      SOA SERIAL field, or can hold a different value as long as its
-      semantics are similar to the SOA SERIAL field as defined in <xref
-      target="RFC1982" />.</t>
+      field. Such nameservers may synthesize answers on-the-fly without
+      updating the serial. This memo introduces a ZONESERIAL field with
+      a new per-zone serial value that can be used to check for
+      freshness of the zone's data. The ZONESERIAL value can be
+      identical to the value in the SOA SERIAL field, or can hold a
+      different value as long as its semantics are similar to the SOA
+      SERIAL field as defined in <xref target="RFC1982" />.</t>
 
       <t>To signal support for DNS opportunistic refresh, clients add a
       ZONE EDNS option to their queries. The ZONE EDNS option contains 2
