@@ -214,11 +214,11 @@
 
           <c>0.0</c>
           <c>caches auth answer mail.example.org./A with TTL=3600,
-          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
 
           <c>0.1</c>
-          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
-          TIME=0</c>
+          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
+          at TIME=0</c>
 
           <c>0.2</c>
           <c>replies from cache for mail.example.org./A</c>
@@ -232,11 +232,11 @@
 
           <c>2700.0</c>
           <c>caches auth answer git.example.org./A with TTL=3600,
-          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
 
           <c>2700.1</c>
-          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
-          TIME=2700</c>
+          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
+          at TIME=2700</c>
 
           <c>2700.2</c>
           <c>replies from cache for git.example.org./A</c>
@@ -245,8 +245,8 @@
           <c>receives query for mail.example.org./A</c>
 
           <c>3601.1</c>
-          <c>has note that SERIAL was unchanged at TIME=2700, so
-          its cached mail.example.org./A answer is valid till time
+          <c>has note that ZONESERIAL was unchanged at TIME=2700, so its
+          cached mail.example.org./A answer is valid till time
           2700+3600</c>
 
           <c>3601.2</c>
@@ -274,11 +274,11 @@
 
           <c>0.0</c>
           <c>caches auth answer mail.example.org./A with TTL=3600,
-          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
 
           <c>0.1</c>
-          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
-          TIME=0</c>
+          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
+          at TIME=0</c>
 
           <c>0.2</c>
           <c>replies from cache for mail.example.org./A</c>
@@ -292,11 +292,11 @@
 
           <c>2700.0</c>
           <c>caches auth answer git.example.org./A with TTL=3600,
-          ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt;</c>
+          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
 
           <c>2700.1</c>
-          <c>notes that ZONE=&lt;SERIAL=42,ZONENAME=example.org.&gt; at
-          TIME=2700</c>
+          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
+          at TIME=2700</c>
 
           <c>2700.2</c>
           <c>replies from cache for git.example.org./A</c>
@@ -312,8 +312,8 @@
           mail.example.org./A</c>
 
           <c>3595.0</c>
-          <c>has note that SERIAL was unchanged at TIME=2700, so
-          its cached mail.example.org./A answer is valid till time
+          <c>has note that ZONESERIAL was unchanged at TIME=2700, so its
+          cached mail.example.org./A answer is valid till time
           2700+3600</c>
 
           <c>3595.0</c>
@@ -348,7 +348,7 @@
           <ttcol>Type</ttcol>
           <ttcol>Field size</ttcol>
 
-          <c>SERIAL</c>
+          <c>ZONESERIAL</c>
           <c>32-bit unsigned integer</c>
           <c>4 octets</c>
 
@@ -358,11 +358,11 @@
 
         </texttable>
 
-        <t>The SERIAL and ZONENAME fields may together be absent from
-        query messages when these values are unknown to the client (from
-        previous queries) for the question it is querying for. In this
-        case, the OPTION-DATA field is empty and OPTION-LENGTH field for
-        the EDNS option is set to 0.</t>
+        <t>The ZONESERIAL and ZONENAME fields may together be absent
+        from query messages when these values are unknown to the client
+        (from previous queries) for the question it is querying for. In
+        this case, the OPTION-DATA field is empty and OPTION-LENGTH
+        field for the EDNS option is set to 0.</t>
 
         <t>In all other cases, both fields MUST be present in the
         option.</t>
@@ -370,8 +370,8 @@
       </section>
 
       <section title="Option fields">
-        <section title="SERIAL">
-          <t>The SERIAL field is represented as a 32-bit unsigned
+        <section title="ZONESERIAL">
+          <t>The ZONESERIAL field is represented as a 32-bit unsigned
           integer in network byte order. TBD.</t>
         </section>
         <section title="ZONENAME">
