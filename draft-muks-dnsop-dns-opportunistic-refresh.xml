@@ -93,12 +93,12 @@
       <t>This document describes a mechanism using which a DNS resolver
       can receive information about the freshness of a zone's cached
       records from an authoritative server, and can opportunistically
-      refresh TTLs of all of the zone's cached records without making
-      additional queries per each record set over the network to refresh
-      expired records. Using this mechanism can also reduce the workload
-      of authoritative servers in constructing replies for refresh
-      queries and the risk of losing such replies across the
-      network.</t>
+      refresh TTLs of all of the zone's cached records (by restarting
+      them) without making additional queries per each record set over
+      the network to refresh expired records. Using this mechanism can
+      also reduce the workload of authoritative servers in constructing
+      replies for refresh queries and the risk of losing such replies
+      across the network.</t>
     </abstract>
 
   </front>
@@ -109,10 +109,10 @@
       <t>DNS secondary nameservers use the value in a zone's SOA RR's
       SERIAL field <xref target="RFC1035" /> to determine freshness of
       the copy of a zone that they are maintaining locally, and to
-      establish if a zone transfer to update the zone is
+      establish whether a zone transfer to update the zone is
       necessary. Typically they perform this through SOA refresh timeout
       or the NOTIFY mechanism, when they compare the SOA SERIAL value
-      from the local copy of a zone against the SOA SERIAL value from a
+      of the local copy of a zone against the SOA SERIAL value from a
       remote primary nameserver, and perform a zone transfer if the
       serial number comparison <xref target="RFC1982" /> establishes
       that a zone transfer is necessary. By using the SOA RR's SERIAL
@@ -120,18 +120,17 @@
       for local data that is already fresh, thereby reducing network
       traffic and nameserver resource usage.</t>
 
-      <t>Similarly, HTTP is a request/response protocol that allows
-      caching data with a TTL duration. HTTP provides the concept of
-      "cache validators" (see Section 13.3 of <xref target="RFC2616" />)
-      using which a HTTP client can validate the freshness of an expired
-      resource in cache and extend its lifetime without requiring a
-      retransfer of the resource.</t>
+      <t>HTTP is a data transfer protocol that allows caching data with
+      a TTL duration. HTTP provides the concept of "cache validators"
+      (see Section 13.3 of <xref target="RFC2616" />) using which a HTTP
+      client can validate the freshness of an expired resource in cache
+      and extend its lifetime without requiring a retransfer of the
+      resource.</t>
 
-      <t>This memo introduces such a scheme to non-transfer DNS QUERY
-      which can benefit the DNS when caching resolvers are
-      involved. There are several advantages in having this scheme in
-      the DNS, and these are explored in <xref target="sec-advantages"
-      />.</t>
+      <t>This memo introduces such a scheme to regular DNS QUERY which
+      can benefit the DNS when caching resolvers are involved. There are
+      several advantages in having this scheme in the DNS, and these are
+      explored in <xref target="sec-advantages" />.</t>
 
       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
       NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
@@ -145,12 +144,13 @@
       transfers. Some custom authoritiative servers that don't implement
       zone transfers do not care to maintain a useful value in the
       field. Such nameservers may synthesize answers on-the-fly without
-      updating the serial. This memo introduces a ZONESERIAL field with
-      a new per-zone serial value that can be used to check for
-      freshness of the zone's data. The ZONESERIAL value can be
-      identical to the value in the SOA SERIAL field, or can hold a
-      different value as long as its semantics are similar to the SOA
-      SERIAL field as defined in <xref target="RFC1982" />.</t>
+      updating the serial. This memo introduces a ZONE EDNS option with
+      a ZONESERIAL field containing a distinct per-zone serial value
+      that can be used to check for freshness of the zone's data. The
+      ZONESERIAL value can be identical to the value in the SOA SERIAL
+      field, or can hold a different value as long as its semantics are
+      similar to the SOA SERIAL field as defined in <xref
+      target="RFC1982" />.</t>
 
       <t>To signal support for DNS opportunistic refresh, clients add a
       ZONE EDNS option to their queries. The ZONE EDNS option contains 2
@@ -168,15 +168,19 @@
 
       <t>It is OPTIONAL for a client to add a ZONE EDNS option to DNS
       query messages. If it adds such an option, it might be of 0 length
-      (having no fields) or have 2 fields. If a client has no prior
+      (having no fields) or have 2 fields. If a client has no previously
       cached ZONESERIAL field value from a previous query for that zone,
-      it sends a 0 length EDNS option to signal support for the DNS
-      opportunistic refresh feature. If it has a previously cached
-      ZONESERIAL and ZONENAME matching the zone it is querying, it sends
-      a ZONE EDNS option with the ZONESERIAL and ZONENAME set to their
-      most recently cached values.</t>
+      it sends an EDNS option with OPTION-LENGTH 0 to signal support for
+      the DNS opportunistic refresh feature. If it has a previously
+      cached ZONESERIAL and ZONENAME matching the zone it is querying,
+      it sends a ZONE EDNS option with the ZONESERIAL and ZONENAME set
+      to their most recently cached values.</t>
 
-      <t>TBD: Transitive use of this scheme through forwarders and
+      <t>A caching client is required to cache the original TTL of RRs
+      in an answer apart from using it in a countdown timer. This is so
+      that it is able to restart the timer when necessary.</t>
+
+      <t>TBD: Transitive use of this scheme through forwarders and other
       intermediate resolvers (RD=1) where the nameserver may return a
       non-authoritative answer (AA=0) is currently unsupported and may
       remain so.</t>
@@ -194,7 +198,6 @@
         typically have www, mail, jabber, sip, git, wiki, etc. that get
         lookups continuously)</t>
 
-        <t>TBD.</t>
       </section>
 
       <section title="Examples" anchor="sec-examples">
@@ -360,9 +363,9 @@
 
         <t>The ZONESERIAL and ZONENAME fields may together be absent
         from query messages when these values are unknown to the client
-        (from previous queries) for the question it is querying for. In
-        this case, the OPTION-DATA field is empty and OPTION-LENGTH
-        field for the EDNS option is set to 0.</t>
+        (if it is the first query) for the question it is querying
+        for. In this case, the OPTION-DATA field is empty and
+        OPTION-LENGTH field for the EDNS option is set to 0.</t>
 
         <t>In all other cases, both fields MUST be present in the
         option.</t>
