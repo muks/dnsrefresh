@@ -34,19 +34,27 @@
 
   <front>
 
-    <title>DNS opportunistic refresh for resolvers</title>
+    <title>DNS Opportunistic Refresh for Resolvers</title>
 
-    <author fullname="Shane Kerr" initials="S." surname="Kerr">
-      <organization>Beijing Internet Institute</organization>
+    <author fullname="Mukund Sivaraman" initials="M." surname="Sivaraman">
+      <organization>Internet Systems Consortium</organization>
       <address>
         <postal>
-          <street>2/F, Building 5, No.58 Jinghai Road, BDA</street>
-          <city>Beijing</city>
-          <code>100176</code>
-          <country>CN</country>
+          <street>950 Charter Street</street>
+          <city>Redwood City</city>
+          <code>94063</code>
+          <region>CA</region>
+          <country>US</country>
         </postal>
-        <email>shane@biigroup.cn</email>
-        <uri>http://www.biigroup.com/</uri>
+        <email>muks@isc.org</email>
+        <uri>http://www.isc.org/</uri>
+      </address>
+    </author>
+
+    <author fullname="Shane Kerr" initials="S." surname="Kerr">
+      <organization>Oracle</organization>
+      <address>
+        <email>shane@timetravellers.org</email>
       </address>
     </author>
 
@@ -65,21 +73,6 @@
       </address>
     </author>
 
-    <author fullname="Mukund Sivaraman" initials="M." surname="Sivaraman">
-      <organization>Internet Systems Consortium</organization>
-      <address>
-        <postal>
-          <street>950 Charter Street</street>
-          <city>Redwood City</city>
-          <code>94063</code>
-          <region>CA</region>
-          <country>US</country>
-        </postal>
-        <email>muks@mukund.org</email>
-        <uri>http://www.isc.org/</uri>
-      </address>
-    </author>
-
     <date/>
 
     <!-- Meta-data Declarations -->
@@ -90,15 +83,12 @@
     <!-- <keyword>dns</keyword> -->
 
     <abstract>
-      <t>This document describes a mechanism using which a DNS resolver
-      can receive information about the freshness of a zone's cached
-      records from an authoritative server, and can opportunistically
-      refresh TTLs of all of the zone's cached records (by restarting
-      them) without making additional queries per each record set over
-      the network to refresh expired records. Using this mechanism can
-      also reduce the workload of authoritative servers in constructing
-      replies for refresh queries and the risk of losing such replies
-      across the network.</t>
+      <t>This document describes a mechanism whereby a DNS resolver
+      can opportunistically refresh the TTLs of cached records of a
+      zone using serial number information carried in responses from
+      the zone's nameservers.  As well as improving resolver response
+      time by reducing the need to make upstream queries, the mechanism
+      can also reduce the workload of authoritative servers.</t>
     </abstract>
 
   </front>
@@ -106,311 +96,257 @@
   <middle>
 
     <section title="Introduction">
-      <t>DNS secondary nameservers use the value in a zone's SOA RR's
-      SERIAL field <xref target="RFC1035" /> to determine freshness of
-      the copy of a zone that they are maintaining locally, and to
-      establish whether a zone transfer to update the zone is
-      necessary. Typically they perform this through SOA refresh timeout
-      or the NOTIFY mechanism, when they compare the SOA SERIAL value
-      of the local copy of a zone against the SOA SERIAL value from a
-      remote primary nameserver, and perform a zone transfer if the
-      serial number comparison <xref target="RFC1982" /> establishes
-      that a zone transfer is necessary. By using the SOA RR's SERIAL
-      field, nameservers avoid redundant and unnecessary zone transfers
-      for local data that is already fresh, thereby reducing network
-      traffic and nameserver resource usage.</t>
+      <t>DNS secondary nameservers use the value in a zone's SOA RR's SERIAL
+      field <xref target="RFC1035" /> to determine freshness of the copy of a
+      zone that they are maintaining locally and so establish whether a zone
+      transfer to update the zone is necessary. The SOA RR is retrieved either
+      in response to a NOTIFY message from the primary or by the passing of an
+      interval equal to the SOA refresh timeout.  A comparison of the serial
+      numbers of the stored zone and that in the SOA record <xref
+      target="RFC1982" /> establishes whether a zone transfer is necessary. By
+      using the SOA RR's SERIAL field, nameservers avoid redundant and
+      unnecessary zone transfers for local data that is already fresh, thereby
+      reducing network traffic and nameserver resource usage.</t>
 
-      <t>HTTP is a data transfer protocol that allows caching data with
-      a TTL duration. HTTP provides the concept of "cache validators"
-      (see Section 13.3 of <xref target="RFC2616" />) using which a HTTP
-      client can validate the freshness of an expired resource in cache
-      and extend its lifetime without requiring a retransfer of the
-      resource.</t>
+      <t>This memo introduces a similar scheme to a regular DNS query.  By
+      returning SOA records with DNS responses and associating records in the
+      cache with the serial number of zone at the time they were retrieved, a
+      resolver can use subsequent responses from the zone to determine whether
+      the cached records have changed; if not, the cached records can continue
+      to be used, so eliminating the need to re-fetch the record from its zone's
+      nameservers.</t>
 
-      <t>This memo introduces such a scheme to regular DNS QUERY which
-      can benefit the DNS when caching resolvers are involved. There are
-      several advantages in having this scheme in the DNS, and these are
-      explored in <xref target="sec-advantages" />.</t>
-
-      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
-      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
-      in this document are to be interpreted as described in <xref
-      target="RFC2119" />.</t>
     </section>
 
-    <section title="Client and server behavior" anchor="sec-behavior">
-
-      <t>The SOA SERIAL field's value is largely only used for zone
-      transfers. Some custom authoritiative servers that don't implement
-      zone transfers do not care to maintain a useful value in the
-      field. Such nameservers may synthesize answers on-the-fly without
-      updating the serial. This memo introduces a ZONE EDNS option with
-      a ZONESERIAL field containing a distinct per-zone serial value
-      that can be used to check for freshness of the zone's data. The
-      ZONESERIAL value can be identical to the value in the SOA SERIAL
-      field, or can hold a different value as long as its semantics are
-      similar to the SOA SERIAL field as defined in <xref
-      target="RFC1982" />.</t>
-
-      <t>To signal support for DNS opportunistic refresh, clients add a
-      ZONE EDNS option to their queries. The ZONE EDNS option contains 2
-      fields: ZONESERIAL and ZONENAME. These fields are described in
-      <xref target="sec-format" />. If the authoritative server supports
-      the feature, it returns a ZONE EDNS option in its reply from the
-      contents of which a client can determine if all the records it
-      currently has cached for that zone are still fresh.</t>
-
-      <t>Use of this scheme is voluntary and can be switched off
-      completely on a per-zone basis either by the authoritiative
-      nameserver or by the caching resolver. Queries between a client
-      and authoritative server where one side does not implement and
-      enable this EDNS option are not affected.</t>
-
-      <t>It is OPTIONAL for a client to add a ZONE EDNS option to DNS
-      query messages. If it adds such an option, it might be of 0 length
-      (having no fields) or have 2 fields. If a client has no previously
-      cached ZONESERIAL field value from a previous query for that zone,
-      it sends an EDNS option with OPTION-LENGTH 0 to signal support for
-      the DNS opportunistic refresh feature. If it has a previously
-      cached ZONESERIAL and ZONENAME matching the zone it is querying,
-      it sends a ZONE EDNS option with the ZONESERIAL and ZONENAME set
-      to their most recently cached values.</t>
-
-      <t>A caching client is required to cache the original TTL of RRs
-      in an answer apart from using it in a countdown timer. This is so
-      that it is able to restart the timer when necessary.</t>
-
-      <t>TBD: Transitive use of this scheme through forwarders and other
-      intermediate resolvers (RD=1) where the nameserver may return a
-      non-authoritative answer (AA=0) is currently unsupported and may
-      remain so.</t>
-
-      <section title="Advantages" anchor="sec-advantages">
-
-        <t>It may seem non-intuitive, but on a caching resolver, this
-        scheme could benefit smaller zones more than larger
-        zones. Typically, smaller zones are updated less frequently, and
-        so, cached records from a small zone are more likely to be
-        fresh.</t>
-
-        <t>TBD: Add use-cases of common multi-lookup sequences described
-        to Evan (AAAA and DNSKEY; SRV and AAAA; small office setups that
-        typically have www, mail, jabber, sip, git, wiki, etc. that get
-        lookups continuously)</t>
-
-      </section>
-
-      <section title="Examples" anchor="sec-examples">
-        <t>An example of the scheme follows:</t>
-
-        <texttable>
-
-          <ttcol align="right">TIME</ttcol>
-          <ttcol align="left">Resolver behavior</ttcol>
-
-          <c>-15.0</c>
-          <c>receives query for mail.example.org./A</c>
-
-          <c>-10.0</c>
-          <c>queries nameserver for mail.example.org./A with empty
-          ZONE option</c>
-
-          <c>0.0</c>
-          <c>caches auth answer mail.example.org./A with TTL=3600,
-          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
-
-          <c>0.1</c>
-          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
-          at TIME=0</c>
-
-          <c>0.2</c>
-          <c>replies from cache for mail.example.org./A</c>
-
-          <c>2595.0</c>
-          <c>receives query for git.example.org./A</c>
-
-          <c>2600.0</c>
-          <c>queries nameserver for git.example.org./A with empty
-          ZONE option</c>
-
-          <c>2700.0</c>
-          <c>caches auth answer git.example.org./A with TTL=3600,
-          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
-
-          <c>2700.1</c>
-          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
-          at TIME=2700</c>
-
-          <c>2700.2</c>
-          <c>replies from cache for git.example.org./A</c>
-
-          <c>3601.0</c>
-          <c>receives query for mail.example.org./A</c>
-
-          <c>3601.1</c>
-          <c>has note that ZONESERIAL was unchanged at TIME=2700, so its
-          cached mail.example.org./A answer is valid till time
-          2700+3600</c>
-
-          <c>3601.2</c>
-          <c>bumps mail.example.org./A TTL to expire at TIME=6300</c>
-
-          <c>3601.3</c>
-          <c>replies from cache for mail.example.org./A</c>
-
-        </texttable>
-
-        <t>The same can similarly be adopted for lazy TTL update during
-        prefetch <xref target="I-D.wkumari-dnsop-hammer" />:</t>
-
-        <texttable>
-
-          <ttcol align="right">TIME</ttcol>
-          <ttcol align="left">Resolver behavior</ttcol>
-
-          <c>-15.0</c>
-          <c>receives query for mail.example.org./A</c>
-
-          <c>-10.0</c>
-          <c>queries nameserver for mail.example.org./A with empty
-          ZONE option</c>
-
-          <c>0.0</c>
-          <c>caches auth answer mail.example.org./A with TTL=3600,
-          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
-
-          <c>0.1</c>
-          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
-          at TIME=0</c>
-
-          <c>0.2</c>
-          <c>replies from cache for mail.example.org./A</c>
-
-          <c>2595.0</c>
-          <c>receives query for git.example.org./A</c>
-
-          <c>2600.0</c>
-          <c>queries nameserver for git.example.org./A with empty
-          ZONE option</c>
-
-          <c>2700.0</c>
-          <c>caches auth answer git.example.org./A with TTL=3600,
-          ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;</c>
-
-          <c>2700.1</c>
-          <c>notes that ZONE=&lt;ZONESERIAL=42,ZONENAME=example.org.&gt;
-          at TIME=2700</c>
-
-          <c>2700.2</c>
-          <c>replies from cache for git.example.org./A</c>
-
-          <c>3595.0</c>
-          <c>receives query for mail.example.org./A</c>
-
-          <c>3595.0</c>
-          <c>replies from cache for mail.example.org./A</c>
-
-          <c>3595.0</c>
-          <c>determines that prefetch is required for
-          mail.example.org./A</c>
-
-          <c>3595.0</c>
-          <c>has note that ZONESERIAL was unchanged at TIME=2700, so its
-          cached mail.example.org./A answer is valid till time
-          2700+3600</c>
-
-          <c>3595.0</c>
-          <c>resolver bumps mail.example.org./A TTL to expire at
-          TIME=6300</c>
-
-        </texttable>
-
-        <t>Note that other records from the same zone can be similarly
-        refreshed without network fetches.</t>
-
-      </section>
+    <section  title="Requirements Notation">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref target="RFC2119"/>.
+      </t>
     </section>
 
-    <section title="The ZONE EDNS(0) option" anchor="sec-format">
+    <section title="Opportunistic DNS Refresh">
+      <section title="Overview">
+        <t>The idea is best illustrated with an example:</t>
 
-      <t>ZONE is an EDNS(0) <xref target="RFC6891" /> option that is
-      used to transmit information about a zone. Client and server
-      behavior are described in <xref target="sec-behavior" />. In this
-      section, the option's syntax is provided.</t>
+        <t><list style="numbers">
 
-      <section title="Wire format">
+	      <t>At time t=0, a resolver queries an authoritative server of
+	      example.com for the AAAA record of www.example.com.  It includes
+	      an EDNS0 option <xref target="RFC6891" /> that requests that the
+	      example.com nameservers also return the SOA RR of example.com.
+	      The authoritative server returns the AAAA record for
+	      www.example.com along with the copy of the current SOA record.  It
+	      also returns the ZONESERIAL EDNS0 option that guarantees to the
+	      resolver that any change in the example.com will be accompanied by
+	      a change in the zone's serial number.  Suppose that AAAA record is
+	      the address 2001:DB8::1 and that it has a TTL of 3600.  Also
+	      suppose that the serial number of the SOA record is 42.</t>
 
-        <t>The following describes the wire format of the OPTION-DATA
-        field <xref target="RFC6891" /> of the ZONE EDNS option. All
-        ZONE option fields must be represented in network byte
-        order.</t>
+	      <t>At time t=3000, the resolver queries an authoritative server of
+	      example.com for the MX record of example.com.  This query also
+	      includes the EDNS0 option requesting the SOA RR.  The
+	      authoritative server returns the requested data, together with the
+	      SOA RR in the Additional Section of the response as well as the
+	      ZONESERIAL EDNS0 option.  Assume that the SOA record indicates
+	      that the serial number is unchanged at 42.</t>
 
-        <texttable>
+	      <t>At time t=4000, the resolver receives a query for the AAAA
+	      record of www.example.com. In the normal course of events the
+	      resolver would have to re-fetch the record because the cached
+	      record has expired.  However, the resolver knows that had it
+	      queried for the AAAA record of www.example.com at t=3000, it would
+	      have got the same answer as it has cached (2001:DB8::1 and an
+	      initial TTL of 3600), since the query for the MX record showed
+	      that the zone's serial number was unchanged and that the server
+	      guarantees that the serial number will change on every update to
+	      the zone.  The only difference would be that instead of the record
+	      being expired, the TTL of the record would now be 2600 (the
+	      original TTL of 3600 less the 1000 seconds that have elapsed since
+	      the query for the MX record). Instead of fetching the record
+	      again, the resolver can set the TTL to 2600, reflecting the valid
+	      state that would have occurred had the resolver queried for the
+	      record at the same time as it queried for the MX record.</t>
 
-          <ttcol>Option field</ttcol>
-          <ttcol>Type</ttcol>
-          <ttcol>Field size</ttcol>
+	    </list></t>
 
-          <c>ZONESERIAL</c>
-          <c>32-bit unsigned integer</c>
-          <c>4 octets</c>
+	    <t>Use of opportunistic refresh requires that both resolvers and
+	    authoritative servers signal their support for the protocol via an
+	    EDNS0 option. This is the ZONESERIAL option and is required
+	    because:</t>
 
-          <c>ZONENAME</c>
-          <c>DNS name <xref target="RFC1035" /></c>
-          <c>Variable length</c>
+        <t><list style="symbols">
 
-        </texttable>
+	      <t>Resolvers need to request the authoritative servers to include
+	      an SOA RR in their responses. Adding an SOA record to a response
+	      when it is not needed just wastes bandwidth.</t>
 
-        <t>The ZONESERIAL and ZONENAME fields may together be absent
-        from query messages when these values are unknown to the client
-        (if it is the first query) for the question it is querying
-        for. In this case, the OPTION-DATA field is empty and
-        OPTION-LENGTH field for the EDNS option is set to 0.</t>
+	      <t>Authoritative servers need to signal that the zone's serial
+	      number changes every time the contents of the zone change, so
+	      confirming to resolvers that the serial number is an indication of
+	      the zone's freshness. This should be the normal state of affairs,
+	      but some authoritative servers generate content on the fly and may
+	      not update the SOA serial number. Although omission of the SOA RR
+	      could be used as an indication that the server does not support
+	      opportunistic refresh, this feature allows zone freshness
+	      information to be extracted from any SOA record in the answer,
+	      e.g. responses returning NXDOMAIN or explicit queries for the SOA.
+	      Under these circumstances, the ZONESERIAL option is required in
+	      the response in order to prevent misinterpretation.</t>
 
-        <t>In all other cases, both fields MUST be present in the
-        option.</t>
+        </list></t>
 
       </section>
 
-      <section title="Option fields">
-        <section title="ZONESERIAL">
-          <t>The ZONESERIAL field is represented as a 32-bit unsigned
-          integer in network byte order. TBD.</t>
-        </section>
-        <section title="ZONENAME">
-          <t>The ZONENAME field contains the origin name of the zone
-          which contains the authoritative answer for the question. This
-          is represented as a DNS name in wire format <xref
-          target="RFC1035" />. Name compression MUST NOT be used <xref
-          target="RFC3597" />. TBD.</t>
-        </section>
+    </section>
+
+    <section title="Detailed Description">
+      <t>To signal support for DNS opportunistic refresh, resolvers add the
+      ZONESERIAL EDNS0 option to their queries.  Bit 7 of the option's FLAGS
+      field is the request/acknowlege flag and MUST be clear in the request to
+      the authoritative server.</t>
+
+      <t>Upon receiving a ZONESERIAL EDNS0 option with the request/acknowlege
+      flag clear, an authoritative server supporting DNS opportunistic refresh
+      MUST include an SOA RR in the answer.  The location of the SOA RR in the
+      response depends on the query:</t>
+
+      <t><list style="symbols">
+
+	    <t>If the query is such that an SOA RR would be included in the
+	    reponse (e.g. query resulting in NXDOMAIN, an ANY query), no special
+	    processing is required: the SOA RR is included in its usual
+	    place.</t>
+
+	    <t>For other queries, the authoritative server MUST include a copy
+	    of the SOA RR in the Additional Section of the response.</t>
+
+      </list></t>
+
+      <t>In addition to the SOA RR, the authoritative server MUST include the
+      ZONESERIAL EDNS0 option in the response.  The request/acknowledge bit in
+      the flags field MUST also be set in the message.</t>
+
+      <t>Upon receiving a response containing an SOA RR and a valid ZONESERIAL
+      EDNS0 option, the client SHOULD associate the zone's serial number with the
+      RR.  In addition, it SHOULD note the serial number as the indication of
+      the zone's freshness along with the time at which the serial number was
+      valid.</t>
+
+      <t>If the resolver receives a query for an RR that has expired, and the RR
+      is associated with a zone serial number, the resolver compares serial
+      number against the latest version it has for the zone: if the numbers are
+      the same, the resolver calculates the potential new TTL: </t>
+
+      <t>Original TTL - (current time - latest serial number retrieval time)</t>
+
+      <t>If this value is positive and the record is not signed, the resolver
+      can set the TTL of the cached record to this value and return it to the
+      client without re-querying the authoritative server.  If the record is
+      signed and the signature has not yet expired, the resolver should
+      calculate the time to signature expiration, and can set the TTL to the
+      minimum of this and the potential new TTL calculated previously. In all
+      other cases (including cases where - perhaps for policy reasons - the
+      resolver chooses not to extend the TTL), the resolver MUST NOT reset the
+      TTL; instead, it should fetch a new copy of the record from the zone's
+      nameservers.</t>
+
+      <section title="Notes">
+
+        <t>There are a number of cases that require special processing:</t>
+
+        <t><list style="symbols">
+
+	      <t>An authoritative server receiving a misconfigured ZONESERIAL
+	      option in a query SHOULD return a FORMERR response.</t>
+
+	      <t>A resolver receiving a misconfigured ZONESERIAL option in a
+	      response MUST NOT interpret the serial number in any SOA RR in
+	      that response as an indication of zone freshness.  It MAY however
+	      regard the RRs in the response as valid.</t>
+
+	      <t>If, in response to a query containing the ZONESERIAL option to
+	      a zone it has previously established supports this option, a
+	      resolver receives a response containing either no ZONESERIAL
+	      option or an invalid one, the resolver should assume that the zone
+	      can no longer guarantee that the serial number will change on
+	      every zone update.  It MUST clear all existing serial number
+	      information for the zone related to opportunistic DNS refresh.
+	      Subequent queries to the zone SHOULD include the ZONESERIAL
+	      option, allowing the resolver to start building up refresh
+	      information again.</t>
+
+	      <t>In the case of NS records, although the child zone is
+	      authoritative for the NS information, a resolver must periodically
+	      query for the parent's copy of the NS records to ensure that the
+	      delegation is still valid.  To avoid the extension of an NS
+	      record's TTL preventing the resolver from querying the parent, the
+	      resolver MUST NOT extend the TTL of NS records using the method
+	      described here.</t>
+
+	      <t>To avoid any complications related to transitive use of this
+	      scheme through forwarders and other intermediate resolvers where
+	      the nameserver may return a non- authoritative answer, nameservers
+	      that are not authoritative for a zone MUST NOT includes a
+	      ZONESERIAL EDNS0 option in a response to a query for a name in
+	      that zone.</t>
+
+	      <t>If Client Subnet <xref target="RFC7871"/> is enabled, resource
+	      records in the cache may be associated with a subnet.  In these
+	      cases, the resolver MUST ensure that the zone serial number
+	      associated with such records is obtained from an SOA record
+	      associated with the identical subnet.</t>
+
+	    </list></t>
+
       </section>
-      <section title="Presentation format">
-        <t>As with other EDNS(0) options, the ZONE EDNS option does not
-        have a presentation format.</t>
-      </section>
+
+    </section>
+
+    <section title="Option Format">
+      <t>The opportunistic DNS refresh option is encoded as follows:</t>
+
+      <figure align="center" title="ZONERSERIAL EDNS0 Option">
+        <artwork align="center">
+          <![CDATA[
+                     1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-------------------------------+-------------------------------+
+!         OPTION-CODE           !         OPTION-LENGTH         !
++-------------------------------+-------------------------------+
+|     FLAGS     |]]>
++---------------+
+        </artwork>
+      </figure>
+
+      <t>where:</t>
+
+      <t><list style="hanging">
+
+        <t hangText="OPTION-CODE">the EDNS0 option code assigned to
+        opportunistic DNS refresh, &lt;TBD&gt;</t>
+
+        <t hangText="OPTION-LENGTH">the value 1.</t>
+
+	    <t hangText="FLAGS">bit 7 of this field is the request/acknowledge
+	    flag.  This bit MUST be clear in requests from the resolver to the
+	    authoritative server and MUST be set in responses from the
+	    authoritative server to the resolver.</t>
+
+	    <t>Bits 0 to 6 of the FLAGS field are reserved. They MUST be set to
+	    zero by the sender, and MUST be ignored by the receiving server.</t>
+
+      </list></t>
     </section>
 
     <section title="Security considerations" anchor="sec-security">
-      <t>A DNS resolver MUST verify that the ZONENAME field in replies
-      corresponds to the current zone cut that the resolver has
-      determined when contacting the nameserver during the resolution
-      process. This field is provided by the nameserver as a hint to the
-      client for use in cases where the zone cuts cannot be determined
-      without additional queries to the nameserver, such as when parent
-      and child zones of a delegation are served by the same
-      nameserver. The DNS resolver MUST check that this field contains
-      either the expected zone cut, or is a child of the expected zone
-      cut but is equal to or a super-domain of the name in the
-      question.</t>
+      <t>TDB</t>
     </section>
 
     <section title="IANA considerations">
-      <t>This document defines a new EDNS(0) option, titled ZONE (see
-      <xref target="sec-format" />), assigned a value of &lt;TBD&gt;
-      from the DNS EDNS0 Option Codes (OPT) space [to be removed upon
-      publication:
-      https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11].</t>
+      <t>The IANA is directed to assign an EDNS0 option code for the
+      ZONERSERIAL option from the DNS EDNS0 Option Codes (OPT) registry as
+      follows:</t>
 
       <texttable>
 
@@ -420,15 +356,21 @@
         <ttcol>Reference</ttcol>
 
         <c>TBD</c>
-        <c>ZONE</c>
+        <c>ZONESERIAL</c>
         <c>TBD</c>
-        <c>[draft-muks-dnsop-dns-opportunistic-refresh]</c>
+        <c>[This document]</c>
 
       </texttable>
     </section>
 
     <section title="Acknowledgements">
-      <t>The idea was first discussed by Shane and Mukund during IETF-94
+      <t>This document evolved from discussions with a number of people during
+      and after IETF-94: Ray Bellis, Geoff Huston, George Michaelson, Cathy
+      Almond, Mark Andrews, Evan Hunt, Witold Krecicki.  We would also like to
+      acknowledge Bob Harold, who suggested the underlying idea in a post to the
+      DNSOP mailing list back in October 2015.</t>
+
+<!--The idea was first discussed by Shane and Mukund during IETF-94
       where various advantages of using such a scheme were
       discovered. During the same IETF meeting, the scheme was verbally
       described to and discussed with Ray Bellis, Geoff Huston and
@@ -442,6 +384,7 @@
       similar idea was considered by Bob Harold in reply to discussion
       about <xref target="I-D.yao-dnsop-root-cache" /> on 28 October
       2015.</t>
+-->
     </section>
 
   </middle>
@@ -452,54 +395,12 @@
       <?rfc include="reference.RFC.1035.xml"?>
       <?rfc include="reference.RFC.1982.xml"?>
       <?rfc include="reference.RFC.2119.xml"?>
-      <?rfc include="reference.RFC.3597.xml"?>
       <?rfc include="reference.RFC.6891.xml"?>
-      <?rfc include="reference.RFC.7871.xml"?>
-      <?rfc include="reference.I-D.wkumari-dnsop-hammer.xml"?>
     </references>
 
     <references title="Informative references">
-      <?rfc include="reference.RFC.2308.xml"?>
-      <?rfc include="reference.RFC.2616.xml"?>
-      <?rfc include="reference.I-D.yao-dnsop-root-cache.xml"?>
+      <?rfc include="reference.RFC.7871.xml"?>
     </references>
-
-    <section title="Open issues (to be removed before publication)">
-      <t>
-        <list style="symbols">
-
-          <t>Stephen: An alternate scheme is proposed, that includes the
-          SOA RR in the additional section of every reply and doesn't
-          use the EDNS option. If a nameserver doesn't maintain the SOA
-          serial, it doesn't include the SOA RR. A client doesn't
-          process SOA RRs for this scheme from negative answers <xref
-          target="RFC2308" />. Some advantages of using the EDNS option
-          are not available with this scheme.</t>
-
-          <t>The provision of a timestamp of when the zone was last
-          updated should be explored. Because there is no existing way
-          to record and transfer the last updated time of a zone among
-          primary and secondary nameservers, this may be a controversial
-          addition.</t>
-
-          <t>Ray: one thing you may have to consider is NS record
-          handling - there's an issue where a resolver always talks to a
-          child without ever referring back to the parent NS perpetually
-          prolonging the TTL of NS records learned from the child can
-          permit phantom zones (where the zone may have been turned off,
-          or had parent NS changes, but the resolver doesn't notice).</t>
-
-          <t>The behavior of when DNSSEC re-validation may be avoided
-          should be described precisely.</t>
-
-          <t>EDNS client-subnet <xref target="RFC7871" /> can supply
-          different answers depending on the client subnet. The
-          interaction with this scheme should be explored and any
-          necessary changes should be made to accomodate it.</t>
-
-        </list>
-      </t>
-    </section>
 
     <section title="Change history (to be removed before publication)">
       <t>
