@@ -108,12 +108,13 @@
       unnecessary zone transfers for local data that is already fresh, thereby
       reducing network traffic and nameserver resource usage.</t>
 
-      <t>This memo introduces a similar scheme to a regular DNS query.  By
-      returning SOA records with DNS responses and associating records in the
-      cache with the serial number of zone at the time they were retrieved, a
+      <t>This memo introduces a similar - but optional - scheme, to a regular
+      DNS query.  A DNS resolver requests an authoritative server to return the
+      SOA record along with the the results of a query. By associating these
+      records with the serial number of zone at the time they were retrieved, a
       resolver can use subsequent responses from the zone to determine whether
-      the cached records have changed; if not, the cached records can continue
-      to be used, so eliminating the need to re-fetch the record from its zone's
+      cached records have changed; if not, the cached records can continue to be
+      used, so eliminating the need to re-fetch the record from its zone's
       nameservers.</t>
 
     </section>
@@ -138,10 +139,11 @@
 	      The authoritative server returns the AAAA record for
 	      www.example.com along with the copy of the current SOA record.  It
 	      also returns the ZONESERIAL EDNS0 option that guarantees to the
-	      resolver that any change in the example.com will be accompanied by
-	      a change in the zone's serial number.  Suppose that AAAA record is
-	      the address 2001:DB8::1 and that it has a TTL of 3600.  Also
-	      suppose that the serial number of the SOA record is 42.</t>
+	      resolver that any change in the example.com zone will be
+	      accompanied by a change in the zone's serial number.  Suppose that
+	      the AAAA record is the address 2001:DB8::1 and that it has a TTL of
+	      3600.  Also suppose that the serial number of the SOA record is
+	      42.</t>
 
 	      <t>At time t=3000, the resolver queries an authoritative server of
 	      example.com for the MX record of example.com.  This query also
@@ -177,9 +179,10 @@
 
         <t><list style="symbols">
 
-	      <t>Resolvers need to request the authoritative servers to include
-	      an SOA RR in their responses. Adding an SOA record to a response
-	      when it is not needed just wastes bandwidth.</t>
+	      <t>Resolvers need to explicitly request that authoritative servers
+	      to include an SOA RR in their responses, since adding an SOA
+	      record to a response when it is not needed just wastes
+	      bandwidth.</t>
 
 	      <t>Authoritative servers need to signal that the zone's serial
 	      number changes every time the contents of the zone change, so
@@ -201,55 +204,76 @@
     </section>
 
     <section title="Detailed Description">
-      <t>To signal support for DNS opportunistic refresh, resolvers add the
-      ZONESERIAL EDNS0 option to their queries.  Bit 7 of the option's FLAGS
-      field is the request/acknowlege flag and MUST be clear in the request to
-      the authoritative server.</t>
+      <section title="Resolver Behavior - Querying an Authoritative Server">
+        <t>To signal support for DNS opportunistic refresh, resolvers MUST add the
+        ZONESERIAL EDNS0 option to their queries.  Bit 7 of the option's FLAGS
+        field is the request/acknowledge flag and MUST be clear in the request to
+        the authoritative server.</t>
+      </section>
 
-      <t>Upon receiving a ZONESERIAL EDNS0 option with the request/acknowlege
-      flag clear, an authoritative server supporting DNS opportunistic refresh
-      MUST include an SOA RR in the answer.  The location of the SOA RR in the
-      response depends on the query:</t>
+      <section title="Authoritative Server Behavior - Processing a Query">
+        <t>Upon receiving a ZONESERIAL EDNS0 option with the request/acknowledge
+        flag clear, the action of the authoritative server depends on the response
+        being returned:</t>
+  
+        <t><list style="symbols">
+  
+          <t>If the answer is a negative response (e.g. NODATA or NXDOMAIN),
+          no special action is required: the SOA of the zone that was searched
+          for the answer will be included in the response.</t>
+  
+          <t>If the answer is a positive response or a referral, the SOA for the
+          zone from which the answer was obtained SHOULD be included in the
+          additional section of the answer.</t>
+ 
+        </list></t>
 
-      <t><list style="symbols">
+        <t>In all cases, the authoritative server MUST include the
+        ZONESERIAL EDNS0 option in the response.  The request/acknowledge bit in
+        the FLAGS field MUST also be set in the message.</t>
+      </section>
 
-	    <t>If the query is such that an SOA RR would be included in the
-	    reponse (e.g. query resulting in NXDOMAIN, an ANY query), no special
-	    processing is required: the SOA RR is included in its usual
-	    place.</t>
+      <section title="Resolver Behavior - Processing a Response">
+    	<t>Upon receiving a positive response containing an SOA RR and a valid
+    	ZONESERIAL EDNS0 option, the resolver SHOULD associate the zone's serial
+    	number with the RRs in the answer.  In addition, it SHOULD note the
+    	serial number as the indication of the zone's freshness along with the
+    	time at which the serial number was valid.</t>
 
-	    <t>For other queries, the authoritative server MUST include a copy
-	    of the SOA RR in the Additional Section of the response.</t>
+        <t>If a negative response is received and the message contains a valid
+        ZONESERIAL EDNS0 options, the resolver SHOULD update its record of the
+        zone's serial number, as well as noting the time at which this serial
+        number was valid.</t>
+      </section>
 
-      </list></t>
+      <section title="Resolver Behavior - Processing a Subsequent Query">
+    	<t>When a resolver receives a query, it will check its cache to see whether
+        the answer is present.  If it is, but the TTL has expired, an opportunistic
+        refresh-enabled resolver SHOULD check to see if the record is associated
+        with a zone serial number.  If it is, the resolver SHOULD compare the serial
+    	number against the latest serial number it has for the zone. If the numbers
+    	are the same, the resolver SHOULD calculate a new TTL: </t>
+    
+    	<t>candidate TTL = Original TTL - (current time - latest serial number retrieval
+    	time)</t>
+    
+    	<t>If this value is positive and the record is not signed, the resolver
+    	MAY set the TTL of the cached record to this value and return it to the
+    	client without re-querying the authoritative server.</t>
 
-      <t>In addition to the SOA RR, the authoritative server MUST include the
-      ZONESERIAL EDNS0 option in the response.  The request/acknowledge bit in
-      the flags field MUST also be set in the message.</t>
+	    <t>If the value is positive and the record is signed the resolver
+	    SHOULD calculate the time to signature expiration.  If this is
+        a postive value, the resolver MAY set the TTL of the record
+        to:</t>
 
-      <t>Upon receiving a response containing an SOA RR and a valid ZONESERIAL
-      EDNS0 option, the client SHOULD associate the zone's serial number with the
-      RR.  In addition, it SHOULD note the serial number as the indication of
-      the zone's freshness along with the time at which the serial number was
-      valid.</t>
+        <t>New TTL = MIN(Candidate TTL, Time to Signature Expiration)</t>
 
-      <t>If the resolver receives a query for an RR that has expired, and the RR
-      is associated with a zone serial number, the resolver compares serial
-      number against the latest version it has for the zone: if the numbers are
-      the same, the resolver calculates the potential new TTL: </t>
-
-      <t>Original TTL - (current time - latest serial number retrieval time)</t>
-
-      <t>If this value is positive and the record is not signed, the resolver
-      can set the TTL of the cached record to this value and return it to the
-      client without re-querying the authoritative server.  If the record is
-      signed and the signature has not yet expired, the resolver should
-      calculate the time to signature expiration, and can set the TTL to the
-      minimum of this and the potential new TTL calculated previously. In all
-      other cases (including cases where - perhaps for policy reasons - the
-      resolver chooses not to extend the TTL), the resolver MUST NOT reset the
-      TTL; instead, it should fetch a new copy of the record from the zone's
-      nameservers.</t>
+    	<t>In all
+    	other cases (including cases where - perhaps for policy reasons - the
+    	resolver chooses not to extend the TTL), the resolver MUST NOT reset the
+    	TTL; instead, it should fetch a new copy of the record from the appropriate
+    	nameservers.</t>
+      </section>
 
       <section title="Notes">
 
@@ -328,10 +352,14 @@
 
         <t hangText="OPTION-LENGTH">the value 1.</t>
 
-	    <t hangText="FLAGS">bit 7 of this field is the request/acknowledge
-	    flag.  This bit MUST be clear in requests from the resolver to the
-	    authoritative server and MUST be set in responses from the
-	    authoritative server to the resolver.</t>
+	    <t hangText="FLAGS">Flags field.  Bit 7 of this field is the
+	    request/acknowledge flag.  This bit MUST be clear in requests from
+	    the resolver to the authoritative server and MUST be set in
+	    responses from the authoritative server to the resolver. By flipping
+        the bit in a response, answers from misbehaving authoritiative servers
+        that just copy unknown EDNS0 options from query to response are
+        not mistakenly treated as being from servers that understand
+        opportunistic DNS refresh.</t>
 
 	    <t>Bits 0 to 6 of the FLAGS field are reserved. They MUST be set to
 	    zero by the sender, and MUST be ignored by the receiving server.</t>
@@ -339,7 +367,7 @@
       </list></t>
     </section>
 
-    <section title="Security considerations" anchor="sec-security">
+    <section title="Security Considerations" anchor="sec-security">
       <t>TDB</t>
     </section>
 
