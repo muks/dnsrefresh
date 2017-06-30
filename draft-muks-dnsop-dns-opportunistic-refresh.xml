@@ -180,7 +180,7 @@
         <t><list style="symbols">
 
 	      <t>Resolvers need to explicitly request that authoritative servers
-	      to include an SOA RR in their responses, since adding an SOA
+	      include an SOA RR in their responses, since adding an SOA
 	      record to a response when it is not needed just wastes
 	      bandwidth.</t>
 
@@ -241,7 +241,7 @@
     	time at which the serial number was valid.</t>
 
         <t>If a negative response is received and the message contains a valid
-        ZONESERIAL EDNS0 options, the resolver SHOULD update its record of the
+        ZONESERIAL EDNS0 option, the resolver SHOULD update its record of the
         zone's serial number, as well as noting the time at which this serial
         number was valid.</t>
       </section>
@@ -311,7 +311,7 @@
 	      <t>To avoid any complications related to transitive use of this
 	      scheme through forwarders and other intermediate resolvers where
 	      the nameserver may return a non- authoritative answer, nameservers
-	      that are not authoritative for a zone MUST NOT includes a
+	      that are not authoritative for a zone MUST NOT include a
 	      ZONESERIAL EDNS0 option in a response to a query for a name in
 	      that zone.</t>
 
