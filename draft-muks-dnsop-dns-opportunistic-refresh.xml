@@ -430,6 +430,9 @@
       get the resolver to extend TTLs incorrectly by replacing the SOA record
       with a correctly-signed but out-of-date copy.</t>
 
+      <t>It should be noted that even without opportunistic refresh, an
+      attacker can replay DNSSEC signed answers with long-lived
+      signatures.</t>
     </section>
 
     <section title="IANA considerations">
