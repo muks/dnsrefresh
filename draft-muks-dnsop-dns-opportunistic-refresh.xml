@@ -172,7 +172,7 @@
 
 	    </list></t>
 
-        <t>The example given in above illustrates the case where the TTL
+        <t>The example given above illustrates the case where the TTL
         of a resource record is extended after it is found to be
         expired.  However, caching resolvers are free to extend the TTL
         of unexpired records in the same manner. Suppose that instead of
@@ -303,7 +303,7 @@
 	      regard the RRs in the response as valid.</t>
 
           <t>A resolver receiving a response containing a valid ZONESERIAL
-          option but not SOA MUST behavse as if the ZONESERIAL option were
+          option but not SOA MUST behave as if the ZONESERIAL option were
           absent.  It MAY regard the RRs in the response as valid.</t>
 
 	      <t>If, in response to a query containing the ZONESERIAL option to
