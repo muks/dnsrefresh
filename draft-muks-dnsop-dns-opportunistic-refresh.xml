@@ -353,7 +353,7 @@
 
       <section title="Operational Considerations">
         <t>The usefulness of opportunistic refresh depends on both the
-        average interval between updates to the SOA and on the TTL of
+        average interval between updates to the SOA and on the cacheable TTL of
         resource records.  For an extension of the TTL to take place, the
         record has to be both accessed and the TTL extended between
         changes to the SOA serial number.  If this interval is short
