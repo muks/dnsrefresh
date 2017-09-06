@@ -360,12 +360,14 @@
         compared to the TTL of the record, the benefit of the feature
         will be marginal.</t>
 
-        <t>A corner case of of this scenario is where the serial numbering
-        scheme, rate of updates and query pattern are such that it is possible
-        for the serial number to completely wrap round and the resolver
-        not notice the intermediate changes, so inappropriately extending
-        a TTL.  Although unlikely, an authoritative server in such an environment
-        MUST NOT enable the feature.</t>
+        <t>A corner case of of this scenario is where the serial
+        numbering scheme, rate of updates and query pattern are such
+        that it is possible for the serial number to completely wrap
+        round and count up to the same previously cached serial, and the
+        resolver does not notice the intermediate changes, so
+        inappropriately extending a TTL.  Although unlikely, an
+        authoritative server in such an environment MUST NOT enable the
+        feature.</t>
 
       </section>
 
