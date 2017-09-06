@@ -419,16 +419,16 @@
       DNSSEC-signed records.  Although the validity of a resource record is
       determined by its TTL, it is not unusual for the signature validity period
       to be a large multiple of the TTL.  It may therefore possible for an
-      attacker to spoof responses using copies of out of date but still
+      attacker to spoof responses using copies of out-of-date but still
       validly-signed records. It should also be noted that the OPT resource
-      record containing the EDNS0 option is not protected by the DNSSEC
+      record containing the EDNS0 option is not protected by a DNSSEC
       signature.</t>
 
       <t>In the context of opportunistic refresh, if an attacker were able to do
       this they could either (a) effectively disable the opportunistic DNS
       feature by removing the SOA RR and/or modifying the EDNS0 option, or (b)
       get the resolver to extend TTLs incorrectly by replacing the SOA record
-      with a correctly-signed but out of date copy.</t>
+      with a correctly-signed but out-of-date copy.</t>
 
     </section>
 
