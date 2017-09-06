@@ -216,16 +216,17 @@
 
     <section title="Detailed Description">
       <section title="Resolver Behavior - Querying an Authoritative Server">
-        <t>To signal support for DNS opportunistic refresh, resolvers MUST add the
-        ZONESERIAL EDNS0 option to their queries.  Bit 7 of the option's flags
-        field is the request/acknowledge flag and MUST be clear in the request to
-        the authoritative server.</t>
+        <t>To signal support for DNS opportunistic refresh, resolvers
+        MUST add the ZONESERIAL EDNS0 option to their queries. The "R"
+        request/acknowledge flag MUST be clear in the request to the
+        authoritative server.</t>
       </section>
 
       <section title="Authoritative Server Behavior - Processing a Query">
-        <t>Upon receiving a ZONESERIAL EDNS0 option with the request/acknowledge
-        flag clear, the action of the authoritative server implementing opportunistic
-        refresh depends on the response being returned:</t>
+        <t>Upon receiving a ZONESERIAL EDNS0 option with the "R"
+        request/acknowledge flag clear, the action of the authoritative
+        server implementing opportunistic refresh depends on the
+        response being returned:</t>
   
         <t><list style="symbols">
   
@@ -240,8 +241,8 @@
         </list></t>
 
         <t>In all cases, the authoritative server MUST include the
-        ZONESERIAL EDNS0 option in the response.  The request/acknowledge bit in
-        the flags field MUST also be set in the message.</t>
+        ZONESERIAL EDNS0 option in the response.  The "R"
+        request/acknowledge flag MUST also be set in the message.</t>
       </section>
 
       <section title="Resolver Behavior - Processing a Response">
@@ -294,8 +295,9 @@
         <t><list style="symbols">
 
 	      <t>An authoritative server receiving an invalid ZONESERIAL
-	      option in a query (e.g. a ZONESERIAL option with the request/acknowledge
-          flag set) SHOULD return a FORMERR response.</t>
+	      option in a query (e.g. a ZONESERIAL option with the "R"
+	      request/acknowledge flag set) SHOULD return a FORMERR
+	      response.</t>
 
 	      <t>A resolver receiving an invalid ZONESERIAL option in a
 	      response MUST NOT interpret the serial number in any SOA RR in
@@ -401,10 +403,11 @@
         <t hangText="Reserved">A 7-bit unused field.  It MUST be initialized
         to zero by the sender and MUST be ignored by the received.</t>
 
-        <t hangText="R">1-bit request/acknowledge flag.  This bit MUST be
-        clear in requests from the resolver to the authoritative server
-        and MUST be set in responses from the authoritative server to
-        the resolver. By flipping the bit in a response, answers from
+        <t hangText="R">1-bit request/acknowledge flag (least
+        significant bit in the octet). This bit MUST be clear in
+        requests from the resolver to the authoritative server and MUST
+        be set in responses from the authoritative server to the
+        resolver. By flipping the bit in a response, answers from
         misbehaving authoritiative servers that just copy unknown EDNS0
         options from query to response are not mistakenly treated as
         being from servers that understand opportunistic DNS
